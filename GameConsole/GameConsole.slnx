@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../GameCore/GameCore/GameCore.csproj" />
+  <Project Path="../godot/Godot.csproj">
+    <BuildType Solution="Release|*" Project="ExportDebug" />
+  </Project>
+  <Project Path="GameConsole/GameConsole.csproj" />
+</Solution>
