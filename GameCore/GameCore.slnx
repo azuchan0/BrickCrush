@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="GameCore/GameCore.csproj" />
+  <Project Path="GameML/GameML.csproj" Id="072570bf-c007-4f55-b3f9-249dd94d340c" />
 </Solution>

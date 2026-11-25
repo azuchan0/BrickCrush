@@ -1,10 +1,36 @@
-# Visual Studio / .NET
+# .NET build output
 bin/
 obj/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.nupkg
+
+# Visual Studio
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
 
-# Godot 4
+# JetBrains Rider / VS Code
+.idea/
+*.DotSettings.user
+.vscode/
+
+# Godot 4 (keep *.import files: Godot needs them to import assets)
 .godot/
-*.import
+/godot/android/
+*.translation
+export_presets.cfg
+mono_crash.*.json
+
+# ML models and training data (regenerate with --selfplay or --train)
+models/
+*.csv
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

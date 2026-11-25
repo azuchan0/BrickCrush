@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "Play": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "Train AI from my game": {
+      "commandName": "Project",
+      "commandLineArgs": "--train",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "Watch AI play": {
+      "commandName": "Project",
+      "commandLineArgs": "--ai",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "AI self-training": {
+      "commandName": "Project",
+      "commandLineArgs": "--selfplay 5000",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
