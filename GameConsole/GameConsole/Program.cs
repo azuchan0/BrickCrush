@@ -40,17 +40,24 @@ catch (Exception e) when (e is ArgumentException || e is FileNotFoundException)
 Console.WriteLine($"Ball: ({game.BallX}, {game.BallY})");
 Console.WriteLine($"Bricks left: {game.RemainingBricks}");
 
-// The ball moves every 100 ms, independently of the frame rate.
+// The core handles all timing; the console only measures frame time.
 var clock = System.Diagnostics.Stopwatch.StartNew();
-long nextBallMove = 100;
+double lastFrame = 0;
+
+// The console only reports key presses (no key release), so a key counts
+// as held for a short time after each press or auto-repeat.
+const double KeyHoldSeconds = 0.15;
+double leftHeldUntil = 0;
+double rightHeldUntil = 0;
 
 Console.CursorVisible = false;
 Console.Clear();
 
 while (!game.IsGameOver && !game.IsWon)
 {
-    bool moveLeft = false;
-    bool moveRight = false;
+    double now = clock.Elapsed.TotalSeconds;
+    double deltaTime = now - lastFrame;
+    lastFrame = now;
 
     // Drain all pending key presses for this frame.
     while (Console.KeyAvailable)
@@ -58,18 +65,18 @@ while (!game.IsGameOver && !game.IsWon)
         var key = Console.ReadKey(intercept: true).Key;
 
         if (key == ConsoleKey.LeftArrow)
-            moveLeft = true;
+        {
+            leftHeldUntil = now + KeyHoldSeconds;
+            rightHeldUntil = 0;
+        }
         else if (key == ConsoleKey.RightArrow)
-            moveRight = true;
+        {
+            rightHeldUntil = now + KeyHoldSeconds;
+            leftHeldUntil = 0;
+        }
     }
 
-    game.MovePaddle(moveLeft, moveRight);
-
-    if (clock.ElapsedMilliseconds >= nextBallMove)
-    {
-        game.MoveBall();
-        nextBallMove += 100;
-    }
+    game.Update(deltaTime, now < leftHeldUntil, now < rightHeldUntil);
 
     // Redraw from the top-left corner instead of clearing, to limit flicker.
     Console.SetCursorPosition(0, 0);

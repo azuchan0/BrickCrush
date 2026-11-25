@@ -32,28 +32,44 @@ namespace GameML
         // Loads a saved model; returns false if the file does not exist.
         public bool Load(string path)
         {
-            var ml = RequireInit();
+            if (!File.Exists(path))
+                return false;
 
-            if (!File.Exists(path)) return false;
+            using (var stream = File.OpenRead(path))
+                Load(stream);
 
-            ITransformer model = ml.Model.Load(path, out _);
-            _engine = ml.Model.CreatePredictionEngine<GameSample, ActionPrediction>(model);
             return true;
         }
 
-        // Trains on recorded samples, saves the model and makes it usable.
+        // Loads a model from any seekable stream (engine resources, memory...).
+        public void Load(Stream stream)
+        {
+            var ml = RequireInit();
+
+            ITransformer model = ml.Model.Load(stream, out _);
+            _engine = ml.Model.CreatePredictionEngine<GameSample, ActionPrediction>(model);
+        }
+
+        // Trains on recorded samples, saves the model to a file and makes it usable.
         public void Train(IEnumerable<GameSample> samples, string path)
+        {
+            string? folder = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(folder))
+                Directory.CreateDirectory(folder);
+
+            using (var stream = File.Create(path))
+                Train(samples, stream);
+        }
+
+        // Trains on recorded samples, writes the model to a stream and makes it usable.
+        public void Train(IEnumerable<GameSample> samples, Stream output)
         {
             var ml = RequireInit();
 
             IDataView data = ml.Data.LoadFromEnumerable(samples);
             ITransformer model = _pipeline!.Fit(data);
 
-            string? folder = Path.GetDirectoryName(path);
-            if (!string.IsNullOrEmpty(folder))
-                Directory.CreateDirectory(folder);
-
-            ml.Model.Save(model, data.Schema, path);
+            ml.Model.Save(model, data.Schema, output);
             _engine = ml.Model.CreatePredictionEngine<GameSample, ActionPrediction>(model);
         }
 
